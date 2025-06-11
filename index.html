@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>骨格診断＆似合うヘアスタイル提案</title>
+    <style>
+        body {
+            font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: #5a4a42;
+        }
+        #quiz-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .question {
+            margin-bottom: 25px;
+        }
+        .question p {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #7d6b62;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        label:hover {
+            background-color: #f0ebe8;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #8d7a70;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #7d6b62;
+        }
+        #result-container {
+            display: none;
+            background: #fff;
+            padding: 30px;
+            margin-top: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .result-type {
+            font-size: 28px;
+            font-weight: bold;
+            color: #c5a99e;
+            margin-bottom: 15px;
+        }
+        .description {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .hair-suggestion {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .hair-item {
+            width: calc(33% - 20px);
+            text-align: center;
+        }
+        .hair-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .hair-item p {
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .hair-item {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>骨格診断＆似合うヘアスタイル提案</h1>
+
+    <div id="quiz-container">
+        <h2>あなたの特徴を教えてください</h2>
+        <form id="skeleton-quiz">
+            <div class="question">
+                <p>Q1. 手や手首の特徴は？</p>
+                <label><input type="radio" name="q1" value="straight"> A. 手のひらに厚みがあり、関節はあまり目立たない</label>
+                <label><input type="radio" name="q1" value="wave"> B. 手のひらは薄く、華奢な印象</label>
+                <label><input type="radio" name="q1" value="natural"> C. 関節や骨がしっかりしていて、指輪が関節で止まりやすい</label>
+            </div>
+
+            <div class="question">
+                <p>Q2. 鎖骨の特徴は？</p>
+                <label><input type="radio" name="q2" value="straight"> A. あまり目立たず、まっすぐな印象</label>
+                <label><input type="radio" name="q2" value="wave"> B. 細く、くっきりと浮き出ている</label>
+                <label><input type="radio" name="q2" value="natural"> C. 太く、しっかりとした存在感がある</label>
+            </div>
+
+            <div class="question">
+                <p>Q3. 首から肩にかけてのラインは？</p>
+                <label><input type="radio" name="q3" value="straight"> A. 首は短めで、肩周りに厚みがある</label>
+                <label><input type="radio" name="q3" value="wave"> B. 首は長めで、肩のラインはなだらかで華奢</label>
+                <label><input type="radio" name="q3" value="natural"> C. 首の筋が目立ちやすく、肩の骨がしっかりしている</label>
+            </div>
+            
+            <div class="question">
+                <p>Q4. 全体的な体の質感は？</p>
+                <label><input type="radio" name="q4" value="straight"> A. ハリと弾力のある、筋肉質な肌</label>
+                <label><input type="radio" name="q4" value="wave"> B. ふわふわと柔らかく、脂肪を感じる肌</label>
+                <label><input type="radio" name="q4" value="natural"> C. 硬めで、骨や筋が感じられるドライな質感</label>
+            </div>
+
+            <button type="button" onclick="diagnose()">診断する</button>
+        </form>
+    </div>
+
+    <div id="result-container">
+        <h2>診断結果</h2>
+        <p class="result-type" id="result-type"></p>
+        <p class="description" id="result-description"></p>
+        
+        <h3>あなたに似合うヘアスタイル</h3>
+        <div class="hair-suggestion" id="hair-suggestion">
+            </div>
+    </div>
+
+    <script>
+        function diagnose() {
+            const answers = {
+                straight: 0,
+                wave: 0,
+                natural: 0
+            };
+
+            const form = document.getElementById('skeleton-quiz');
+            const q1 = form.elements['q1'].value;
+            const q2 = form.elements['q2'].value;
+            const q3 = form.elements['q3'].value;
+            const q4 = form.elements['q4'].value;
+
+            if (!q1 || !q2 || !q3 || !q4) {
+                alert("すべての質問に回答してください。");
+                return;
+            }
+
+            answers[q1]++;
+            answers[q2]++;
+            answers[q3]++;
+            answers[q4]++;
+
+            let resultType = '';
+            let maxVotes = 0;
+            for (const type in answers) {
+                if (answers[type] > maxVotes) {
+                    maxVotes = answers[type];
+                    resultType = type;
+                }
+            }
+            
+            displayResult(resultType);
+        }
+
+        function displayResult(type) {
+            const resultContainer = document.getElementById('result-container');
+            const resultTypeElem = document.getElementById('result-type');
+            const resultDescriptionElem = document.getElementById('result-description');
+            const hairSuggestionElem = document.getElementById('hair-suggestion');
+
+            let typeText, description, hairStyles;
+
+            switch (type) {
+                case 'straight':
+                    typeText = "骨格ストレート";
+                    description = "あなたは、体に厚みがあり、筋肉質でメリハリのある「骨格ストレート」タイプです。立体的でグラマラスなボディラインが特徴。シンプルで上質なスタイルが得意です。";
+                    hairStyles = [
+                        { name: "ショートボブ", image: "https://via.placeholder.com/300x300.png?text=ショートボブ", desc: "首元をすっきり見せることで、着痩せ効果が期待できます。" },
+                        { name: "ストレートミディアム", image: "https://via.placeholder.com/300x300.png?text=ストレートミディアム", desc: "Iラインを強調し、スタイリッシュな印象を与えます。" },
+                        { name: "ストレートロング", image: "https://via.placeholder.com/300x300.png?text=ストレートロング", desc: "縦のラインが強調され、洗練された大人な雰囲気に。" }
+                    ];
+                    break;
+                case 'wave':
+                    typeText = "骨格ウェーブ";
+                    description = "あなたは、体が薄く、曲線的で柔らかな質感を持つ「骨格ウェーブ」タイプです。華奢でなだらかなボディラインが特徴。フェミニンで華やかなスタイルが得意です。";
+                    hairStyles = [
+                        { name: "ゆるふわショート", image: "https://via.placeholder.com/300x300.png?text=ゆるふわショート", desc: "トップにボリュームを出すことで、バランスが良くなります。" },
+                        { name: "ウェーブミディアム", image: "https://via.placeholder.com/300x300.png?text=ウェーブミディアム", desc: "華やかなウェーブが、あなたの柔らかな雰囲気にぴったりです。" },
+                        { name: "エアリーロング", image: "https://via.placeholder.com/300x300.png?text=エアリーロング", desc: "軽やかな動きのあるスタイルで、女性らしさを引き立てます。" }
+                    ];
+                    break;
+                case 'natural':
+                    typeText = "骨格ナチュラル";
+                    description = "あなたは、骨や関節がしっかりとしており、スタイリッシュなフレーム感を持つ「骨格ナチュラル」タイプです。肉感を感じさせない、モデルのような体型が特徴。ラフでカジュアルなスタイルが得意です。";
+                    hairStyles = [
+                        { name: "無造作ショート", image: "https://via.placeholder.com/300x300.png?text=無造作ショート", desc: "ラフなスタイリングが、こなれたおしゃれ感を演出します。" },
+                        { name: "レイヤーミディアム", image: "https://via.placeholder.com/300x300.png?text=レイヤーミディアム", desc: "動きのあるレイヤースタイルで、骨格の強さを和らげます。" },
+                        { name: "ラフウェーブロング", image: "https://via.placeholder.com/300x300.png?text=ラフウェーブロング", desc: "作り込みすぎないラフなウェーブが、あなたの魅力を引き出します。" }
+                    ];
+                    break;
+            }
+
+            resultTypeElem.textContent = typeText;
+            resultDescriptionElem.textContent = description;
+            
+            let hairHtml = '';
+            hairStyles.forEach(style => {
+                hairHtml += `
+                    <div class="hair-item">
+                        <img src="${style.image}" alt="${style.name}">
+                        <p>${style.name}</p>
+                        <span>${style.desc}</span>
+                    </div>
+                `;
+            });
+            hairSuggestionElem.innerHTML = hairHtml;
+
+            resultContainer.style.display = 'block';
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+
+</body>
+</html>
